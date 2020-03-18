@@ -1,2 +1,3 @@
-# project1
- CS50W 2020 - Project 1
+# Project 1
+
+Web Programming with Python and JavaScript
