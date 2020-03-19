@@ -77,10 +77,12 @@ def home(user_id):
 
 @app.route("/home/")
 def home_redirect():
-    user_id = session["user_id"]
-    user = db.execute("SELECT * FROM users WHERE id = :id", {"id": session["user_id"]}).fetchone()
-    return redirect(url_for('home', user_id=user_id))
-
+    if (session.get('logged_in') == True):
+        user_id = session["user_id"]
+        user = db.execute("SELECT * FROM users WHERE id = :id", {"id": session["user_id"]}).fetchone()
+        return redirect(url_for('home', user_id=user_id))
+    else:
+        return redirect(url_for('login'))
 
 @app.route("/search/", methods=["GET"])
 def search():
