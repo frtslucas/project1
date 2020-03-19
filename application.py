@@ -1,7 +1,7 @@
 import os
 import requests
 
-from flask import Flask, session, render_template, request
+from flask import Flask, session, render_template, request, url_for, redirect
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -17,6 +17,7 @@ if not ("postgres://wqsqdaoijpennk:3906fa4aa6ee6edff819762e196802caabfa033eea806
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+app.config['SECRET_KEY'] = 'any secret string'
 Session(app)
 
 # Set up database
@@ -60,10 +61,25 @@ def login():
 
         if(password == user.password):
             session["user_id"] = user['id']
-            return render_template("success.html", message="You are logged in")
+            return redirect(url_for('home', user_id=user.id))
         else:
             return render_template("login.html", message="Incorrect password, please try again")
 
-@app.route("/home", methods=["POST"])
-def home():
-    return render_template("home.html")
+@app.route("/home/<user_id>", methods=["GET"])
+def home(user_id):
+    user = db.execute("SELECT * FROM users WHERE id = :id", {"id": user_id}).fetchone()
+    return render_template("home.html", user=user)
+
+@app.route("/search", methods=["POST"])
+def search():
+    search_category = request.form.get("search_category")
+    search_string = request.form.get("search_string")
+    
+    if(search_category == 'title'):
+        book = db.execute("SELECT * FROM books WHERE title = :title", {"title": search_string}).fetchone()
+    elif(search_category == 'author'):
+        book = db.execute("SELECT * FROM books WHERE author = :author", {"author": search_string}).fetchone()
+    elif(search_category == 'isbn'):
+        book = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": search_string}).fetchone()
+
+    return render_template("book.html", book=book)

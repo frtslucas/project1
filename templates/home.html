@@ -3,6 +3,31 @@
 {% block title %}Home{% endblock %}
 
 {% block body%}
-
-        
+    <div class="box">
+        <div class="container">
+            <h3>Welcome, {{ user.first_name }}!</h3></br>
+        </div>
+        <form action="{{ url_for('search') }}" method="POST">
+            <div class="container">
+                <div class="row">
+                    <div class="col-9">
+                        <input type="text" class="form-control" name="search_string" placeholder="Search Here">
+                    </div>
+                    <div class="col-3">
+                        <select name="search_category" class="form-control">
+                            <option value="title">Title</option>
+                            <option value="author">Author</option>
+                            <option value="isbn">ISBN</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            </br>
+            <div class="container">
+                <div class="col">
+                    <button class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
 {% endblock %}
