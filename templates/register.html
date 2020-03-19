@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}Registration{% endblock %}
+
+{% block body %}
+
+    <div class="box">
+        <form action="{{ url_for('register') }}", method="POST">
+
+            <h2>Sign Up</h2><br/>
+
+            {{ message }}
+    
+            <input type="text" class="form-control" name="first_name" placeholder="First Name"></br>
+            <input type="text" class="form-control" name="last_name" placeholder="Last Name"></br>
+            <input type="text" class="form-control" name="email" placeholder="E-mail"></br>
+            <input type="text" class="form-control" name="username" placeholder="Username"></br>
+            <input type="password" class="form-control" name="password" placeholder="Password"></br>
+            <button class="btn btn-primary">Sign Up</button>
+        </form>
+        <br/>
+        <form action="{{ url_for('index') }}">
+            <button class="btn btn-primary">Home</button>
+        </form>
+    </div>
+
+
+
+{% endblock %}

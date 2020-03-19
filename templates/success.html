@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block title %}Success{% endblock %}
+
+{% block body%}
+    <div class="box">
+        <h2>Success!</h2>
+        <h5>{{ message }}</h5>
+        <br/>
+        <form action="{{ url_for('index') }}", method="GET">
+            <button class="btn btn-primary">Home</button>
+        </form>
+    </div>
+        
+{% endblock %}

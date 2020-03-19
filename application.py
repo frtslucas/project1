@@ -1,9 +1,12 @@
 import os
+import requests
 
-from flask import Flask, session
+from flask import Flask, session, render_template, request
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.exc import IntegrityError
+from models import *
 
 app = Flask(__name__)
 
@@ -23,4 +26,44 @@ db = scoped_session(sessionmaker(bind=engine))
 
 @app.route("/")
 def index():
-    return "Project 1: TODO"
+    return render_template("index.html")
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "GET":
+        return render_template("register.html")
+    elif request.method == "POST":
+        first_name = request.form.get("first_name")
+        last_name = request.form.get("last_name")
+        email = request.form.get("email")
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        user = db.execute("SELECT * FROM users WHERE username = :username", {"username": username}).fetchone()
+        
+        try:
+            db.execute("INSERT INTO users (first_name, last_name, email, username, password) VALUES (:first_name, :last_name, :email, :username, :password)", {"first_name": first_name, "last_name": last_name, "email": email, "username": username, "password": password})
+            db.commit()
+            return render_template("success.html", message="You have been successfully signed up")
+        except IntegrityError:
+            return render_template("register.html", message="The username or email is already being used")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        return render_template("login.html")
+    elif request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        user = db.execute("SELECT * FROM users WHERE username = :username", {"username": username}).fetchone()
+
+        if(password == user.password):
+            session["user_id"] = user['id']
+            return render_template("success.html", message="You are logged in")
+        else:
+            return render_template("login.html", message="Incorrect password, please try again")
+
+@app.route("/home", methods=["POST"])
+def home():
+    return render_template("home.html")

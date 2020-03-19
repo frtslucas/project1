@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block title %}Error{% endblock %}
+
+{% block body%}
+    <div class="box">
+        <h2>Error!</h2>
+        <h5>{{ message }}</h5>
+        {% block button %}{% endblock %}
+    </div>
+        
+{% endblock %}
