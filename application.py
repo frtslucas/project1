@@ -33,7 +33,7 @@ def index():
 def register():
     if request.method == "GET":
         return render_template("register.html")
-    elif request.method == "POST":
+    else:
         first_name = request.form.get("first_name")
         last_name = request.form.get("last_name")
         email = request.form.get("email")
@@ -54,32 +54,52 @@ def register():
 def login():
     if request.method == "GET":
         return render_template("login.html")
-    elif request.method == "POST":
+    else:
         username = request.form.get("username")
         password = request.form.get("password")
         user = db.execute("SELECT * FROM users WHERE username = :username", {"username": username}).fetchone()
 
         if(password == user.password):
-            session["user_id"] = user['id']
-            return redirect(url_for('home', user_id=user.id))
+            session["user_id"] = user["id"]
+            return redirect(url_for("home", user_id=user.id))
         else:
             return render_template("login.html", message="Incorrect password, please try again")
 
-@app.route("/home/<user_id>", methods=["GET"])
+@app.route("/logout")
+def logout():
+	session.clear()
+	return redirect("/")
+        
+@app.route("/home/<int:user_id>")
 def home(user_id):
     user = db.execute("SELECT * FROM users WHERE id = :id", {"id": user_id}).fetchone()
     return render_template("home.html", user=user)
 
-@app.route("/search", methods=["POST"])
-def search():
-    search_category = request.form.get("search_category")
-    search_string = request.form.get("search_string")
-    
-    if(search_category == 'title'):
-        book = db.execute("SELECT * FROM books WHERE title = :title", {"title": search_string}).fetchone()
-    elif(search_category == 'author'):
-        book = db.execute("SELECT * FROM books WHERE author = :author", {"author": search_string}).fetchone()
-    elif(search_category == 'isbn'):
-        book = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": search_string}).fetchone()
+@app.route("/home/")
+def home_redirect():
+    user_id = session["user_id"]
+    user = db.execute("SELECT * FROM users WHERE id = :id", {"id": session["user_id"]}).fetchone()
+    return redirect(url_for('home', user_id=user_id))
 
+
+@app.route("/search/", methods=["GET"])
+def search():
+    args = request.args
+    txtsearch = args["txtsearch"]
+    category = args["category"]
+
+    if(category == "title"):
+       results = db.execute("SELECT * FROM books WHERE title ILIKE '%" + txtsearch + "%' ORDER BY year").fetchall()
+    elif(category == "author"):
+       results = db.execute("SELECT * FROM books WHERE author ILIKE '%" + txtsearch + "%' ORDER BY year").fetchall()
+    elif(category == "year"):
+       results = db.execute("SELECT * FROM books WHERE year ILIKE '%" + txtsearch + "%' ORDER BY year").fetchall()
+    else:
+        results = db.execute("SELECT * FROM books WHERE isbn ILIKE '%" + txtsearch + "%' ORDER BY year").fetchall()
+
+    return render_template("search_results.html", results=results)
+
+@app.route("/book/<string:book_isbn>", methods=["GET"])
+def book(book_isbn):
+    book = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": book_isbn}).fetchone()
     return render_template("book.html", book=book)

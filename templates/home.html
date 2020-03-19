@@ -3,31 +3,35 @@
 {% block title %}Home{% endblock %}
 
 {% block body%}
+    <form action="{{ url_for('logout') }}">
+        <button class="btn btn-primary">Log Out</button>
+    </form>
     <div class="box">
         <div class="container">
             <h3>Welcome, {{ user.first_name }}!</h3></br>
         </div>
-        <form action="{{ url_for('search') }}" method="POST">
-            <div class="container">
+        <div class="container">
+            <form action="{{ url_for('search') }}" method="GET">
                 <div class="row">
                     <div class="col-9">
-                        <input type="text" class="form-control" name="search_string" placeholder="Search Here">
+                        <input type="text" class="form-control" name="txtsearch" placeholder="Search Here">
                     </div>
                     <div class="col-3">
-                        <select name="search_category" class="form-control">
+                        <select name="category" class="form-control">
                             <option value="title">Title</option>
                             <option value="author">Author</option>
                             <option value="isbn">ISBN</option>
+                            <option value="year">Year</option>
                         </select>
                     </div>
                 </div>
-            </div>
-            </br>
-            <div class="container">
-                <div class="col">
-                    <button class="btn btn-primary">Search</button>
+                </br>
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-primary">Search</button>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 {% endblock %}
