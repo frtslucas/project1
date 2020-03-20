@@ -2,6 +2,6 @@ Flask
 Flask-Session
 psycopg2-binary
 SQLAlchemy
-Sqlalchemy.orm
-Sqlalchemy.exc
-Requests
+sqlalchemy.orm
+sqlalchemy.exc
+requests
