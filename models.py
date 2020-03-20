@@ -30,5 +30,3 @@ class Review(db.Model):
     book_isbn = db.Column(db.Integer, db.ForeignKey('books.isbn'), nullable=False)
     rating = db.Column(db.Integer, nullable=False)
     review_text = db.Column(db.String, nullable=False)
-    gr_avg_rating = db.Column(db.Integer)
-    gr_num_ratings = db.Column(db.Integer)

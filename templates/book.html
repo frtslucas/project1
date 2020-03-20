@@ -6,11 +6,55 @@
     <div class="box">
         <h4>Book Details</h4>
     </br>
-        <div class="container" style="text-align: left;">
-                <p>ISBN: {{ book.isbn }}</p>
-                <p>Title: {{ book.title }}</p>
-                <p>Author: {{ book.author }}</p>
-                <p>Publication Year: {{ book.year }}</p>
+        <div class="container">
+            <p>ISBN: {{ book.isbn }}</p>
+            <p>Title: {{ book.title }}</p>
+            <p>Author: {{ book.author }}</p>
+            <p>Publication Year: {{ book.year }}</p>
+            <p>Goodreads Rating: {{ goodreads.books[0].average_rating }}</p>
+            <p>Goodreads Reviews: {{ goodreads.books[0].work_ratings_count }}</p>
+        </div>
+    </br>
+        <div class="container" id="reviews">
+            <h5>Reviews</h5>
+            <h6>{{ message }}</h6>
+            {% for review in reviews %}
+            <div class="review_box" id="review_{{ review.id }}">
+                <p>{{review.first_name }} {{ review.last_name }}</p>
+                <p>Rating: {{ review.rating }}</p>
+                <p>{{ review.review_text }}</p>
+            </div>
+    </br>
+            {% else %}
+            <div class="review_box">
+                <p>No reviews yet, be the first one!</p>
+            </div>
+            {% endfor %}
+            </div>
+    </br>
+        <div class="create_review_box">
+            <h5>Write a review:</h5>
+            <form action="{{ url_for('review', book_isbn=book.isbn) }}" method="POST">
+                <div class="row justify-content-md-center" id="rating">
+                    <div class="col-1">
+                        Rating:
+                    </div>
+                    <div class="col-2">
+                        <select name="rating" class="form-control" id="rating">
+                            <option value="5">5</option>
+                            <option value="4">4</option>
+                            <option value="3">3</option>
+                            <option value="2">2</option>
+                            <option value="1">1</option>
+                        </select>
+                    </div>
+            </br>         
+            </br>   
+                </div>
+                <input type="text" class="form-control" id="review_text" name="review_text">
+            </br>
+                <button class="btn btn-primary">Submit Review</button>
+            </form>
         </div>
     </br>
         <div class="container">

@@ -77,9 +77,8 @@ def home(user_id):
 
 @app.route("/home/")
 def home_redirect():
-    if (session.get('logged_in') == True):
+    if (session.get('user_id') == True):
         user_id = session["user_id"]
-        user = db.execute("SELECT * FROM users WHERE id = :id", {"id": session["user_id"]}).fetchone()
         return redirect(url_for('home', user_id=user_id))
     else:
         return redirect(url_for('login'))
@@ -103,5 +102,29 @@ def search():
 
 @app.route("/book/<string:book_isbn>", methods=["GET"])
 def book(book_isbn):
+
     book = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": book_isbn}).fetchone()
-    return render_template("book.html", book=book)
+    reviews = db.execute("SELECT r.id, r.rating, r.review_text, u.first_name, u.last_name FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.book_isbn = :book_isbn", {"book_isbn": book_isbn})
+
+    res_goodreads = requests.get("https://www.goodreads.com/book/review_counts.json",
+                    params={"key": "sKRIbzWWp8qizliHj7TsJg", "isbns": book_isbn})
+    if res_goodreads.status_code != 200:
+        raise Exception("ERROR: API request unsuccessfull")
+    goodreads = res_goodreads.json()
+
+    return render_template("book.html", book=book, reviews=reviews, goodreads=goodreads)
+
+@app.route("/review/<string:book_isbn>", methods=["POST"])
+def review(book_isbn):
+    review = Review()
+    review.user_id = session["user_id"]
+    review.book_isbn = book_isbn
+    review.rating = request.form.get("rating")
+    review.review_text = request.form.get("review_text")
+
+    if(db.execute("SELECT * FROM reviews WHERE user_id = :user_id AND book_isbn = :book_isbn", {"user_id": review.user_id, "book_isbn": book_isbn}).rowcount == 0):
+        db.add(review)
+        db.commit()
+    else:
+        return render_template("error.html", message="You have already submitted a review to this book")
+    return redirect(url_for('book', book_isbn=book_isbn))
