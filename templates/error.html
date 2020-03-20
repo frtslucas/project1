@@ -7,6 +7,17 @@
         <h2>Error!</h2>
         <h5>{{ message }}</h5>
         {% block button %}{% endblock %}
+        {% if error_code == 2 %}
+        </br>
+            <form action="{{ url_for('book', book_isbn=book_isbn) }}", method="GET">
+                <button class="btn btn-primary">Go Back</button>
+            </form>
+        {% else %}
+        </br>
+            <form action="{{ url_for('home_redirect') }}", method="GET">
+                <button class="btn btn-primary">Home</button>
+            </form>
+        {% endif %}
     </div>
         
 {% endblock %}

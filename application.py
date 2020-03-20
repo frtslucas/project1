@@ -34,18 +34,19 @@ def register():
     if request.method == "GET":
         return render_template("register.html")
     else:
-        first_name = request.form.get("first_name")
-        last_name = request.form.get("last_name")
-        email = request.form.get("email")
-        username = request.form.get("username")
-        password = request.form.get("password")
+        user = User()
+        user.first_name = request.form.get("first_name")
+        user.last_name = request.form.get("last_name")
+        user.email = request.form.get("email")
+        user.username = request.form.get("username")
+        user.password = request.form.get("password")
 
-        user = db.execute("SELECT * FROM users WHERE username = :username", {"username": username}).fetchone()
-        
         try:
-            db.execute("INSERT INTO users (first_name, last_name, email, username, password) VALUES (:first_name, :last_name, :email, :username, :password)", {"first_name": first_name, "last_name": last_name, "email": email, "username": username, "password": password})
+            # db.execute("INSERT INTO users (first_name, last_name, email, username, password) VALUES (:first_name, :last_name, :email, :username, :password)", {"first_name": first_name, "last_name": last_name, "email": email, "username": username, "password": password})
+            db.add(user)
             db.commit()
-            return render_template("success.html", message="You have been successfully signed up")
+            success_code = 1
+            return render_template("success.html", message="You have been successfully signed up", success_code=success_code)
         except IntegrityError:
             return render_template("register.html", message="The username or email is already being used")
 
@@ -60,7 +61,7 @@ def login():
         user = db.execute("SELECT * FROM users WHERE username = :username", {"username": username}).fetchone()
 
         if(user is None):
-            return render_template("login.html", msg_invalid_username="Incorrect username, please try again")
+            return render_template("login.html", msg_invalid_username="Username not registered, please sign up")
 
 
         if(password == user.password):
@@ -133,5 +134,6 @@ def review(book_isbn):
         db.add(review)
         db.commit()
     else:
-        return render_template("error.html", message="You have already submitted a review to this book")
+        error_code = 2
+        return render_template("error.html", message="You have already submitted a review to this book", error_code=error_code, book_isbn=book_isbn)
     return redirect(url_for('book', book_isbn=book_isbn))
