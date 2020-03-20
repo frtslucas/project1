@@ -59,11 +59,15 @@ def login():
         password = request.form.get("password")
         user = db.execute("SELECT * FROM users WHERE username = :username", {"username": username}).fetchone()
 
+        if(user is None):
+            return render_template("login.html", msg_invalid_username="Incorrect username, please try again")
+
+
         if(password == user.password):
             session["user_id"] = user["id"]
             return redirect(url_for("home", user_id=user.id))
         else:
-            return render_template("login.html", message="Incorrect password, please try again")
+            return render_template("login.html", msg_invalid_pw="Incorrect password, please try again")
 
 @app.route("/logout")
 def logout():
@@ -102,6 +106,9 @@ def search():
 
 @app.route("/book/<string:book_isbn>", methods=["GET"])
 def book(book_isbn):
+
+    if (session.get('user_id') is None):
+        return redirect(url_for('login'))
 
     book = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": book_isbn}).fetchone()
     reviews = db.execute("SELECT r.id, r.rating, r.review_text, u.first_name, u.last_name FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.book_isbn = :book_isbn", {"book_isbn": book_isbn})
