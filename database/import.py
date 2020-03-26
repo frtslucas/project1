@@ -8,7 +8,7 @@ engine = create_engine("postgres://wqsqdaoijpennk:3906fa4aa6ee6edff819762e196802
 db = scoped_session(sessionmaker(bind=engine))
 
 def main():
-    f = open("books.csv")
+    f = open("../assets/books.csv")
     reader = csv.reader(f)
     for isbn, title, author, year in reader:
         db.execute("INSERT INTO books (isbn, title, author, year) VALUES (:isbn, :title, :author, :year)",
